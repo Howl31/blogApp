@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <!-- Add Blog Button -->
+      <div class="container pl-0 text-right">
+        <button type="button" style="color: black; border-color: black;" class="btn btn-outline-warning mt-3" data-toggle="modal" data-target="#modalForm"><i class="fas fa-pencil-alt"></i>&nbsp;&nbsp;Write Your Blog</button>
+      </div>
+    <!-- Add Blog End -->
+
+    <!-- Blogs Section -->
+        <div class="list-group container mt-4 mb-5" style="margin-top: 0px;">
+          {% if count == 0 %}
+          <div class="text-center">
+            <h6>No Blogs Posted. Post your blog on clicking "Write Your Blog" button & Be the first one to post a blog.</h6>
+          </div>
+          {% else %}
+          {% for blog in blogs %}
+          <a  class="list-group-item list-group-item-action flex-column align-items-start" style="border: 1px solid #FF7F50;">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1" id="title{{forloop.counter}}">{{blog.title}}</h5>
+              <small>Uploaded On : {{blog.uploaded_on}}</small>
+            </div>
+            <p class="mb-1">{{blog.text|slice:":100"}}...</p>
+            <p style="display:None;" id="content{{forloop.counter}}" class="mb-1">{{blog.text}}</p>
+            <button class="btn btn-secondary pt-1 pb-1 edit_btn" onclick="getID(this)" id="edit_btn{{forloop.counter}}" value="{{blog.id}}" data-toggle="modal" data-target="#modalForm1"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-secondary pt-1 pb-1 view_btn" onclick="location.href='{% url 'blog_detail' blog.id %}'" id="view_btn{{forloop.counter}}" value="{{blog.id}}"><i class="fas fa-eye"></i></button>
+            <small>Author&nbsp;:&nbsp;{{blog.uploaded_by.first_name}}</small><br>
+<!--            <small id="category{{forloop.counter}}">Category&nbsp;:&nbsp;{{blog.category}}</small>-->
+            <small>Category&nbsp;:</small><small id="category{{forloop.counter}}">&nbsp;{{blog.category}}</small>
+          </a>
+          {% endfor %}
+          {% endif %}
+        </div>
+    <!-- Blogs Section End -->
+
+    <!-- Modal -->
+      <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalCenterTitle">Write Your Blog&nbsp;:</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="addForm" action="{% url 'add_blog' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="exampleFormControlInput1">Blog Title&nbsp;:</label>
+                  <input type="text" class="form-control" name="title" id="exampleFormControlInput1" required>
+                </div>
+                <div class="form-group">
+                  <label for="exampleFormControlInput1">Category&nbsp;:</label>
+                  <select class="custom-select" name="category">
+                    <option selected>Select Category</option>
+                    {% for category in categories %}
+                    <option value="{{category}}">{{category}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <input type="hidden" class="form-control" value="post" name="action">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1">Blog Content &nbsp;:</label>
+                  <textarea maxlength="200" class="form-control" name="content" required id="exampleFormControlTextarea1" rows="3" placeholder="Max 200 Characters"></textarea>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-warning">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- End Modal -->
+
+    <!-- Modal for edit blog-->
+      <div class="modal fade" id="modalForm1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalCenterTitle1">Edit Your Blog&nbsp;:</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="editForm" action="" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="exampleFormControlInput12">Blog Title &nbsp;:</label>
+                  <input type="text" class="form-control" name="title" id="exampleFormControlInput12" required>
+                </div>
+                <div class="form-group">
+                  <label for="category_list">Category&nbsp;:</label>
+                  <select class="custom-select" id="category_list" name="category">
+                    <option selected>Select Category</option>
+                    {% for category in categories %}
+                    <option value="{{category}}">{{category}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <input type="hidden" class="form-control" value="post" name="action">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea12">Blog Content &nbsp;:</label>
+                  <textarea maxlength="200" class="form-control" name="content" required id="exampleFormControlTextarea12" rows="3" value=""></textarea>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-warning">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- End Modal -->
+
+    <script>
+      function getID(ele){
+        var id = ele.id.slice(8)
+        var blog_id = parseInt(ele.value);
+        var title = document.getElementById("title"+id).textContent;
+        var content = (document.getElementById("content"+id).textContent);
+        var category = (document.getElementById("category"+id).textContent).slice(1);
+        console.log(title, id, content, category)
+        document.getElementById("exampleFormControlInput12").value = title;
+        document.getElementById("exampleFormControlTextarea12").value = content;
+        document.getElementById("category_list").value = category;
+
+<!--        var value = [];-->
+<!--        {% for category1 in categories %}-->
+<!--        value.push('{{category1}}')-->
+<!--        {% endfor %}-->
+<!--        var i, len;-->
+<!--        for (i = 0, len = value.length-1; i < len; i++) {-->
+<!--          if (category === value[i]){-->
+<!--&lt;!&ndash;            var count = i;&ndash;&gt;-->
+<!--&lt;!&ndash;            document.getElementById("exampleFormSelect").selectedIndex = i;&ndash;&gt;-->
+<!--            console.log(category, value[i])-->
+<!--&lt;!&ndash;            break;&ndash;&gt;-->
+<!--          }-->
+<!--        }-->
+        console.log('category:', category)
+        document.getElementById("editForm").action = "edit_blog/"+blog_id+"/";
+      }
+    </script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <!-- Edit Blog Button -->
+      <div class="container pl-0 text-right">
+        <button type="button" style="color: black; border-color: black;" id="{{blog.id}}" class="btn btn-outline-warning mt-3" onclick="getID(this)" data-toggle="modal" data-target="#modalForm"><i class="fas fa-pencil-alt"></i>&nbsp;&nbsp;Edit Your Blog</button>
+      </div>
+    <!-- Edit Blog End -->
+
+    <!-- Blogs Section -->
+        <div class="list-group container mt-4" style="margin-top: 0px;">
+          <div class="list-group-item list-group-item-action flex-column align-items-start" style="border: 1px solid #FF7F50;">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1" id="title">{{blog.title}}</h5>
+              <small>Uploaded On : {{blog.uploaded_on}}</small>
+            </div>
+            <br>
+            <h6 class="text-danger">Author&nbsp;:&nbsp;{{blog.uploaded_by.first_name}}</h6>
+            <h6 class="text-danger">Category&nbsp;:&nbsp;{{blog.category}}</h6>
+            <br>
+            <p class="mb-1">{{blog.text}}</p>
+            <p style="display:None;" id="content" class="mb-1">{{blog.text}}</p>
+          </div>
+          {% if blog.edited_on %}
+          <small class="mt-3 mr-2 text-right">Last Updated On : {{blog.edited_on}}</small>
+          <small class="mt-2 mr-2 text-right">Updated By : {{blog.edited_by}}</small>
+          {% endif %}
+        </div>
+    <!-- Blogs Section End -->
+
+    <!-- Modal for edit blog-->
+      <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalCenterTitle1">Edit Your Blog&nbsp;:</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="editForm" action="" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="exampleFormControlInput12">Blog Title &nbsp;:</label>
+                  <input type="text" class="form-control" name="title" id="exampleFormControlInput12" required>
+                </div>
+                <input type="hidden" class="form-control" value="post" name="action">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea12">Blog Content &nbsp;:</label>
+                  <textarea maxlength="200" class="form-control" name="content" required id="exampleFormControlTextarea12" rows="3" value=""></textarea>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-warning">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- End Modal -->
+
+    <script>
+      function getID(ele){
+        var blog_id = ele.id
+        var title = document.getElementById("title").textContent;
+        var content = (document.getElementById("content").textContent);
+        console.log(title, blog_id, content)
+        document.getElementById("exampleFormControlInput12").value = title;
+        document.getElementById("exampleFormControlTextarea12").value = content;
+<!--        document.getElementById("editForm").action = "edit_blog/"+blog_id+"/";-->
+      }
+    </script>
+
+{% endblock %}
